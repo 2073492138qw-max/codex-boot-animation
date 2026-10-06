@@ -10,6 +10,12 @@ window; this project does not patch Codex or draw inside its UI.
 ## Status and behavior
 
 **0.7.0-alpha.5 — Windows community preview, not a stable cross-platform plugin.**
+[Download Windows Alpha.5](https://github.com/2073492138qw-max/codex-boot-animation/releases/tag/v0.7.0-alpha.5)
+and follow the [beginner installation guide](START-HERE.md).
+The first GitHub `windows-latest` build passed, but its video-decoder probe failed;
+cloud CI has not passed. This does not replace the existing local acceptance evidence
+or establish second-PC compatibility. The newly authorized optional videos also need
+the source test script's mandatory-cover assertion reconciled with optional covers.
 Earlier visual acceptance used packaged Codex desktop 26.924.6891.0;
 earlier package checks also ran with desktop 26.928.2636.0 and CLI 0.159.2.
 Alpha.5 local checks use desktop 26.930.3930.0 and CLI 0.160.0; see the

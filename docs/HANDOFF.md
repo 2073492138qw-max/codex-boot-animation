@@ -3,6 +3,47 @@
 新对话请先读本文件，再查看 `CHANGELOG.md`、`docs/ARCHITECTURE.md` 和 Git 状态。
 不要重新安装全部功能或修改 Codex 程序本体。保留已正常的启动、新聊天、托盘和视频播放行为。
 
+## 当前收尾：GitHub完整源码与Alpha.5已发布（2026-10-06）
+
+用户授权官方CLI登录，并亲自在GitHub完成repo/read:org/gist/workflow授权。
+最初经现有代理取得设备码，但token轮询TLS失败，网页成功并不代表CLI登录成功；
+重试同一已有权限，使用进程级HTTP/1.1直接连接后登录成功，账号2073492138qw-max，
+凭据保存在Windows keyring。只设置gh的HTTPS协议，不设全局Git credential helper，
+不读取浏览器cookie/令牌、不改系统代理或Codex网络连接，凭据没有写入源码或记录。
+
+Git浅clone仍阻塞，停止只含本轮临时clone路径的3个git进程，未动其他进程；
+通过已登录gh的官方Git数据接口上传当前跟踪快照，逐blobSHA核对、完整treeSHA核对。
+本地5f10ff0的158文件树64731fe187d7c17071bf4a05253e89af2a45f8be，
+远程初次完整提交8d8e00ea7f180dd48dee386e6208a62bf79e4da0，parent=e5e02f75...
+旧远程历史保留，不force、不推送未经扫描的本地旧Git历史。收尾仅更新5份文档，
+提交后再次同步/核对完整树；收尾提交号以Git记录及实际同步回执为准，避免自引用哈希。
+
+原冻结ead63ed的153文件树c9832a35be767bfaac8cd89da64675b2a7d1c225已原样镜像，
+远程v0.7.0-alpha.5指向da83af68109a73a27a63f3fe0e26960f32978c0b，不改变main。
+镜像采用既有远程parent，因此commit/tag OID不是本地ead63ed/annotated-tag OID；
+源码树内容完全一致。本地旧标签未移动，未来不能盲推覆盖远程标签。
+
+复用空draft ID404366448，补合法标签/中文说明；先传三附件并逐个比对服务器digest/size，
+再发布为prerelease=True、draft=False：
+https://github.com/2073492138qw-max/codex-boot-animation/releases/tag/v0.7.0-alpha.5
+ZIP=60,039,511 bytes，SHA256=85d26f36aec2afe8dcf113f4e70b4c8f5deb086c70719a6bebd97bfc7ed7d8ca。
+.zip.sha256=114 bytes，digest=34147cc8e2e4a4cd513d94f060a560dfc5b35bd24cc054ca0330fb705193e42f；
+.verify.md=1780 bytes，digest=56f2da62b71c1bafbef68cd983a3ac957293ea40891370a3fa7631c65a9aa5e3。
+ZIP/附件未改。main为15个授权视频路径，冻结ZIP/发布标签为原11段；补充图标CC BY4
+授权与最新版小白钩子步骤已在Release明确链接，避免历史包内“仅本机”说明造成歧义。
+
+新发现独立未通过项：Actions run37428618120的Build通过，Test在scripts/Test.ps1:16
+视频解码探针失败（Intro decoder recovery probe failed），后续测试skipped；具体根因
+未确认，不能直接归因云端无桌面或用户硬件。读取日志使用按host划分的进程代理，
+没有改系统网络。运行时源码未改、没有删测试让CI变绿，README/Release明确云端未通过。
+源码新增4个无首帧素材仍会遇到测试脚本强制首帧的静态契约冲突，待另立小任务适配；
+不能改成要求用户今后必须制作首帧。另一台电脑、多屏/缩放等仍未完整验证。
+
+本轮实际BootPlayer.exe SHA256复核保持88F5D616FCE804371917A122FEE6E021DD47AB68DA5B3728969AFC9256CF45D6。
+无安装/重启/播放/信任/自启动/视频/声音/布局改动，也没有关机。
+临时上传helper仅在本机Temp，未进公开仓库；下一步不扩改，只由用户选择CI最小诊断。
+下面为历史记录，以本节为准。
+
 ## 当前停止点：上传传输诊断与远程缺项核查完成，官方 CLI 尚未授权
 
 2026-10-06用户要求解决不能上传。开始Git干净、HEAD=160cab8，仅处理上传路线。
