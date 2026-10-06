@@ -12,6 +12,23 @@ jobs:
       - name: Build
         shell: pwsh
         run: ./scripts/Build.ps1
+      - name: Inspect media prerequisites
+        shell: pwsh
+        run: |
+          Get-WindowsFeature Server-Media-Foundation | Select-Object Name, InstallState
+          Get-Service Audiosrv, AudioEndpointBuilder | Select-Object Name, Status, StartType
+          Get-CimInstance Win32_SoundDevice | Select-Object Name, Status
+      - name: Compare software-rendered decoder probe
+        shell: pwsh
+        env:
+          CBA_PROBE_SOFTWARE_RENDERING: '1'
+        run: |
+          $exe = Join-Path $PWD 'plugins/codex-boot-animation/hooks/BootPlayer.exe'
+          $probe = Start-Process -FilePath $exe -ArgumentList '--intro-media-decoder-probe' -WindowStyle Hidden -PassThru
+          try {
+            if (-not $probe.WaitForExit(18000)) { $probe.Kill(); throw 'Software decoder probe timed out.' }
+            if ($probe.ExitCode -ne 0) { throw 'Software decoder probe failed.' }
+          } finally { $probe.Dispose() }
       - name: Test
         shell: pwsh
         run: ./scripts/Test.ps1

@@ -82,6 +82,10 @@ internal static class IntroMediaRecoveryTests {
   DispatcherTimer poll=null;bool pass=false;
   try{
    IntroLog.Write("decoder-probe-enter interactive="+Environment.UserInteractive+" session="+System.Diagnostics.Process.GetCurrentProcess().SessionId);
+   if(Environment.GetEnvironmentVariable("CBA_PROBE_SOFTWARE_RENDERING")=="1"){
+    System.Windows.Interop.RenderOptions.ProcessRenderMode=System.Windows.Interop.RenderMode.SoftwareOnly;
+    IntroLog.Write("decoder-probe-software-rendering");
+   }
    string[] paths=MediaLibrary.List(VideoScene.NewChat);Require(paths.Length>0,"decoder-fixture-missing");
    app=new Application{ShutdownMode=ShutdownMode.OnExplicitShutdown};
    IntroLog.Write("decoder-probe-application-created clips="+paths.Length);
@@ -96,8 +100,11 @@ internal static class IntroMediaRecoveryTests {
    poll=new DispatcherTimer{Interval=TimeSpan.FromMilliseconds(50)};
    poll.Tick+=delegate{
     try{
-     if(DateTime.UtcNow>=deadline)throw new InvalidOperationException("decoder-probe-timeout-stage-"+stage);
      MediaElement element=(MediaElement)Field(slot,"Media");
+     if(DateTime.UtcNow>=deadline){
+      IntroLog.Write("decoder-probe-timeout ready="+Field(slot,"Ready")+" failed="+Field(slot,"Failed")+" position="+element.Position.TotalSeconds+" video-width="+element.NaturalVideoWidth+" frame-changes="+frameChanges);
+      throw new InvalidOperationException("decoder-probe-timeout-stage-"+stage);
+     }
      if((stage==1||stage==3||stage==5)&&element.Position.TotalSeconds>0.2){
       string frame=FrameFingerprint(element);
       if(frame!=null){if(lastFrame!=null&&frame!=lastFrame)frameChanges++;lastFrame=frame;}
