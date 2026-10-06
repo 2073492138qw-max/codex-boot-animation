@@ -82,10 +82,6 @@ internal static class IntroMediaRecoveryTests {
   DispatcherTimer poll=null;bool pass=false;
   try{
    IntroLog.Write("decoder-probe-enter interactive="+Environment.UserInteractive+" session="+System.Diagnostics.Process.GetCurrentProcess().SessionId);
-   if(Environment.GetEnvironmentVariable("CBA_PROBE_SOFTWARE_RENDERING")=="1"){
-    System.Windows.Media.RenderOptions.ProcessRenderMode=System.Windows.Interop.RenderMode.SoftwareOnly;
-    IntroLog.Write("decoder-probe-software-rendering");
-   }
    string[] paths=MediaLibrary.List(VideoScene.NewChat);Require(paths.Length>0,"decoder-fixture-missing");
    app=new Application{ShutdownMode=ShutdownMode.OnExplicitShutdown};
    IntroLog.Write("decoder-probe-application-created clips="+paths.Length);
@@ -139,7 +135,7 @@ internal static class IntroMediaRecoveryTests {
     }catch(Exception e){IntroLog.Write("intro-media-decoder-probe-error type="+e.GetType().Name+" stage="+e.Message);poll.Stop();app.Shutdown();}
    };
    poll.Start();IntroLog.Write("decoder-probe-dispatcher-start");app.Run();
-   IntroLog.Write("intro-media-decoder-probe pass="+pass+" clips="+index+" pixel-motion-checked=True");return pass;
+   IntroLog.Write("intro-media-decoder-probe pass="+pass+" clips="+index+" pixel-motion-checked="+pass);return pass;
   }catch(Exception e){IntroLog.Write("intro-media-decoder-probe-error type="+e.GetType().Name);return false;}
   finally{if(poll!=null)poll.Stop();if(window!=null)window.Close();if(app!=null&&!app.Dispatcher.HasShutdownStarted)app.Shutdown();}
  }
