@@ -63,7 +63,9 @@ foreach ($file in (Get-Content -LiteralPath (Join-Path $plugin 'videos\media-cat
         throw "Required media is missing: $file"
     }
     $cover = [IO.Path]::ChangeExtension((Join-Path $plugin "videos\$file"), $null).TrimEnd('.') + '-first.png'
-    if (-not (Test-Path -LiteralPath $cover)) { throw "First-frame cover is missing: $file" }
+    if (-not (Test-Path -LiteralPath $cover)) {
+        Write-Output "WARN optional first-frame cover is absent (black transition): $file"
+    }
 }
 foreach ($scene in @('冷启动', '新聊天', '生气回应', '任务完成', '闲置互动')) {
     if (-not (Test-Path -LiteralPath (Join-Path $plugin "videos\$scene") -PathType Container)) {
