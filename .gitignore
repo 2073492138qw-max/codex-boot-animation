@@ -48,4 +48,8 @@ plugins/codex-boot-animation/videos/**/*-first.png
 !plugins/codex-boot-animation/videos/闲置互动/MiniMax_H3_00313_-first.png
 !plugins/codex-boot-animation/videos/未启用素材/线框全息兔耳-备用版.mp4
 !plugins/codex-boot-animation/videos/未启用素材/线框全息兔耳-备用版-first.png
+!plugins/codex-boot-animation/videos/冷启动/MiniMax_H3_00359_.mp4
+!plugins/codex-boot-animation/videos/任务完成/MiniMax_H3_00333_ (1).mp4
+!plugins/codex-boot-animation/videos/闲置互动/MiniMax_H3_00359_.mp4
+!plugins/codex-boot-animation/videos/闲置互动/在吗，在吗.mp4
 dist/

@@ -1,0 +1,30 @@
+name: Windows build and tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        shell: pwsh
+        run: ./scripts/Build.ps1
+      - name: Test
+        shell: pwsh
+        run: ./scripts/Test.ps1
+      - name: Test Windows PowerShell 5.1
+        shell: powershell
+        run: ./scripts/Test.ps1
+      - name: Restore checked-in binary after build verification
+        shell: pwsh
+        run: git restore plugins/codex-boot-animation/hooks/BootPlayer.exe
+      - name: Package reviewed Git snapshot
+        shell: pwsh
+        run: ./scripts/Package-Release.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-alpha-release
+          path: dist/*

@@ -1,0 +1,46 @@
+{
+  "description": "在会话开始时恢复 Windows 片头助手；真正播放由桌面启动或新聊天点击触发。",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "^(startup|clear)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${PLUGIN_ROOT}/hooks/BootPlayer.exe\" --hook",
+            "commandWindows": "& '${PLUGIN_ROOT}\\hooks\\BootPlayer.exe' --hook",
+            "async": true,
+            "timeout": 130,
+            "statusMessage": "正在检查 Codex 片头助手"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${PLUGIN_ROOT}/hooks/BootPlayer.exe\" --stop-hook",
+            "commandWindows": "& '${PLUGIN_ROOT}\\hooks\\BootPlayer.exe' --stop-hook",
+            "async": true,
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${PLUGIN_ROOT}/hooks/BootPlayer.exe\" --prompt-hook",
+            "commandWindows": "& '${PLUGIN_ROOT}\\hooks\\BootPlayer.exe' --prompt-hook",
+            "async": true,
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

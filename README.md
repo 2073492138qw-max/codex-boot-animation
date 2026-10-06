@@ -100,10 +100,12 @@ docs/                                  Architecture and diagnostics
 .github/                               Windows CI and bug-report template
 ```
 
-The reviewed, prebuilt companion and eleven explicitly licensed videos are included for easy
+The reviewed, prebuilt companion and fifteen explicitly licensed video entries are included for easy
 deployment. Build output, personal logs and old experimental binaries are not
-tracked. Additional personal videos are ignored by default until you decide
-their public license. The release catalog covers all five scenes and one inactive spare.
+tracked. Further personal videos are ignored by default until you decide
+their public license. The catalog covers all five scenes and one inactive spare.
+The frozen Alpha.5 installer ZIP has the original eleven videos; four later-authorized
+scene paths are available in this repository, including one clip in two scenes.
 
 ## Install on another Windows PC
 
@@ -211,6 +213,10 @@ including `任务完成后.mp4`, have explicit redistribution permission. New lo
 outside that catalog remain excluded until licensed. The media
 license does not grant rights to third-party trademarks. This is an
 independent community project, not an official OpenAI product.
+
+The AI-generated tray artwork and its derived icons are also licensed under
+[CC BY 4.0](assets/README.md#公开素材授权2026-10-06), including the icon embedded in
+the companion executable. Preserve the attribution and indicate modifications.
 
 ## Development
 
