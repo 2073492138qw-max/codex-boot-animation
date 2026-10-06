@@ -83,7 +83,7 @@ internal static class IntroMediaRecoveryTests {
   try{
    IntroLog.Write("decoder-probe-enter interactive="+Environment.UserInteractive+" session="+System.Diagnostics.Process.GetCurrentProcess().SessionId);
    if(Environment.GetEnvironmentVariable("CBA_PROBE_SOFTWARE_RENDERING")=="1"){
-    System.Windows.Interop.RenderOptions.ProcessRenderMode=System.Windows.Interop.RenderMode.SoftwareOnly;
+    System.Windows.Media.RenderOptions.ProcessRenderMode=System.Windows.Interop.RenderMode.SoftwareOnly;
     IntroLog.Write("decoder-probe-software-rendering");
    }
    string[] paths=MediaLibrary.List(VideoScene.NewChat);Require(paths.Length>0,"decoder-fixture-missing");
