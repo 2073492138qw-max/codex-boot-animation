@@ -1,0 +1,51 @@
+# Build outputs and local diagnostics
+build/
+*.log
+*.pdb
+*.tmp
+*.bak
+*.before-*.exe
+
+# Local editor / OS files
+.vs/
+.vscode/
+*.user
+*.suo
+Thumbs.db
+Desktop.ini
+
+# Never commit machine-local credentials or state
+.env
+.env.*
+!*.env.example
+paused
+
+# Extra personal videos are usable locally but need an explicit licensing
+# decision before being added to a public commit.
+plugins/codex-boot-animation/videos/*.mp4
+plugins/codex-boot-animation/videos/*-first.png
+plugins/codex-boot-animation/videos/**/*.mp4
+plugins/codex-boot-animation/videos/**/*-first.png
+!plugins/codex-boot-animation/videos/新聊天/新聊天-线框全息兔耳.mp4
+!plugins/codex-boot-animation/videos/新聊天/新聊天-线框全息兔耳-first.png
+!plugins/codex-boot-animation/videos/冷启动/冷启动-红色警戒兔耳.mp4
+!plugins/codex-boot-animation/videos/冷启动/冷启动-红色警戒兔耳-first.png
+!plugins/codex-boot-animation/videos/新聊天/新聊天-白发兔耳.mp4
+!plugins/codex-boot-animation/videos/新聊天/新聊天-白发兔耳-first.png
+!plugins/codex-boot-animation/videos/生气回应/生气回应-握拳兔耳.mp4
+!plugins/codex-boot-animation/videos/生气回应/生气回应-握拳兔耳-first.png
+!plugins/codex-boot-animation/videos/生气回应/生气回应，怼回去.mp4
+!plugins/codex-boot-animation/videos/生气回应/生气回应，怼回去-first.png
+!plugins/codex-boot-animation/videos/生气回应/生气回应，放屁熏.mp4
+!plugins/codex-boot-animation/videos/生气回应/生气回应，放屁熏-first.png
+!plugins/codex-boot-animation/videos/生气回应/无所谓的回复.mp4
+!plugins/codex-boot-animation/videos/生气回应/无所谓的回复-first.png
+!plugins/codex-boot-animation/videos/任务完成/任务完成后.mp4
+!plugins/codex-boot-animation/videos/任务完成/任务完成后-first.png
+!plugins/codex-boot-animation/videos/闲置互动/太久没动，擦窗户.mp4
+!plugins/codex-boot-animation/videos/闲置互动/太久没动，擦窗户-first.png
+!plugins/codex-boot-animation/videos/闲置互动/MiniMax_H3_00313_.mp4
+!plugins/codex-boot-animation/videos/闲置互动/MiniMax_H3_00313_-first.png
+!plugins/codex-boot-animation/videos/未启用素材/线框全息兔耳-备用版.mp4
+!plugins/codex-boot-animation/videos/未启用素材/线框全息兔耳-备用版-first.png
+dist/
