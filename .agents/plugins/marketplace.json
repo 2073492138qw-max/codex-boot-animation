@@ -1,0 +1,20 @@
+{
+  "name": "codex-boot-animation",
+  "interface": {
+    "displayName": "Codex Boot Animation"
+  },
+  "plugins": [
+    {
+      "name": "codex-boot-animation",
+      "source": {
+        "source": "local",
+        "path": "./plugins/codex-boot-animation"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
