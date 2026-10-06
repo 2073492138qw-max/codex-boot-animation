@@ -1,0 +1,8 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "codex-boot-animation",
+  "version": "0.7.0-alpha.5",
+  "description": "Windows Codex companion with separate randomized startup, new-chat, reaction, completion and idle video scenes.",
+  "license": "MIT",
+  "author": { "name": "Codex Boot Animation contributors" }
+}
