@@ -81,13 +81,16 @@ internal static class IntroMediaRecoveryTests {
   Application app=null;IntroWindow window=null;
   DispatcherTimer poll=null;bool pass=false;
   try{
+   IntroLog.Write("decoder-probe-enter interactive="+Environment.UserInteractive+" session="+System.Diagnostics.Process.GetCurrentProcess().SessionId);
    string[] paths=MediaLibrary.List(VideoScene.NewChat);Require(paths.Length>0,"decoder-fixture-missing");
    app=new Application{ShutdownMode=ShutdownMode.OnExplicitShutdown};
+   IntroLog.Write("decoder-probe-application-created clips="+paths.Length);
    window=new IntroWindow(null,"--resident","desktop-start");
    // Initialize actual WPF media off-screen without focus, sound or live IPC.
    window.ShowActivated=false;window.Topmost=false;window.WindowState=WindowState.Normal;
    window.Width=320;window.Height=180;window.Left=-32000;window.Top=-32000;window.Opacity=0;
    window.Show();
+   IntroLog.Write("decoder-probe-window-initialized");
    int index=0;object slot=Call(window,"EnsurePrepared",paths[index]);int stage=0,frameChanges=0;string lastFrame=null;
    DateTime deadline=DateTime.UtcNow.AddSeconds(12);
    poll=new DispatcherTimer{Interval=TimeSpan.FromMilliseconds(50)};
@@ -126,7 +129,7 @@ internal static class IntroMediaRecoveryTests {
      }
     }catch(Exception e){IntroLog.Write("intro-media-decoder-probe-error type="+e.GetType().Name+" stage="+e.Message);poll.Stop();app.Shutdown();}
    };
-   poll.Start();app.Run();
+   poll.Start();IntroLog.Write("decoder-probe-dispatcher-start");app.Run();
    IntroLog.Write("intro-media-decoder-probe pass="+pass+" clips="+index+" pixel-motion-checked=True");return pass;
   }catch(Exception e){IntroLog.Write("intro-media-decoder-probe-error type="+e.GetType().Name);return false;}
   finally{if(poll!=null)poll.Stop();if(window!=null)window.Close();if(app!=null&&!app.Dispatcher.HasShutdownStarted)app.Shutdown();}
