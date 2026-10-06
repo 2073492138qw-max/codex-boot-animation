@@ -1,0 +1,21 @@
+{
+  "name": "codex-boot-animation",
+  "version": "0.7.0-alpha.5",
+  "description": "Local videos for Codex desktop startup, new chats, reactions, idle returns, and confirmed task completion on Windows.",
+  "author": {
+    "name": "Codex Boot Animation contributors"
+  },
+  "license": "MIT",
+  "hooks": "./hooks/hooks.json",
+  "interface": {
+    "displayName": "Codex Boot Animation",
+    "shortDescription": "Startup, new-chat, reaction, idle, and task-completion videos.",
+    "longDescription": "A Windows companion uses independent startup, new-chat, reaction, idle, and completion video folders. One MP4 in a folder plays every time; several are chosen randomly within that folder. After 15 minutes without input, return activity resets a two-second quiet timer. One idle clip can fill only the Codex window; further input dismisses it. Local hooks conservatively trigger reactions and task completion without storing prompt text. Native video windows are separate from Codex UI. Windows packaged Codex only; community alpha release.",
+    "developerName": "Codex Boot Animation contributors",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": [
+      "When does the Codex intro play, and how can I skip it?"
+    ]
+  }
+}
