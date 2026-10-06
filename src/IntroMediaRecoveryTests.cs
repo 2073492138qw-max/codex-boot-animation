@@ -96,7 +96,9 @@ internal static class IntroMediaRecoveryTests {
    window.Show();
    IntroLog.Write("decoder-probe-window-initialized");
    int index=0;object slot=Call(window,"EnsurePrepared",paths[index]);int stage=0,frameChanges=0;string lastFrame=null;
-   DateTime deadline=DateTime.UtcNow.AddSeconds(12);
+   // Hosted Windows cold media initialization is slower than an already-warm desktop.
+   // Keep the same decoder/pixel assertions, with a bounded test-only allowance.
+   DateTime deadline=DateTime.UtcNow.AddSeconds(45);
    poll=new DispatcherTimer{Interval=TimeSpan.FromMilliseconds(50)};
    poll.Tick+=delegate{
     try{

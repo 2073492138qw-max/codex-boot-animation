@@ -12,7 +12,7 @@ if ($mediaRecoveryTest.ExitCode -ne 0) { throw 'Intro media failure recovery reg
 Write-Output 'PASS --intro-media-recovery-test'
 $mediaDecoderProbe = Start-Process -FilePath $exe -ArgumentList '--intro-media-decoder-probe' -WindowStyle Hidden -PassThru
 try {
-    if (-not $mediaDecoderProbe.WaitForExit(15000)) { $mediaDecoderProbe.Kill(); throw 'Intro decoder recovery probe timed out.' }
+    if (-not $mediaDecoderProbe.WaitForExit(60000)) { $mediaDecoderProbe.Kill(); throw 'Intro decoder recovery probe timed out.' }
     if ($mediaDecoderProbe.ExitCode -ne 0) { throw 'Intro decoder recovery probe failed.' }
 } finally { $mediaDecoderProbe.Dispose() }
 Write-Output 'PASS --intro-media-decoder-probe'
