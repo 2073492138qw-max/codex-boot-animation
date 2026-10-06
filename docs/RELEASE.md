@@ -11,14 +11,6 @@ Earlier Alpha.1–Alpha.4 ZIPs are retained. Local archive/extracted/isolated-in
 verification is tracked in [the Alpha.5 check record](ALPHA5-PACKAGE-CHECK-2026-10-06.md);
 read that record for the actual result instead of assuming all checks passed.
 
-Alpha.5 local verification passed on 2026-10-06: both PowerShell versions each
-passed 40 extracted-package groups, both non-mutating installer preflights
-passed, and isolated plugin installation/cache/three untrusted hooks passed.
-The immutable ZIP comes from `ead63ed`; the `v0.7.0-alpha.5` tag pins that
-commit. Later report-only commits are not silently repacked into the same ZIP.
-Distribute the ZIP with its `.sha256` and `.verify.md` sidecars. The current
-installation and prior ZIPs were preserved. No upload has been performed.
-
 ## Maintainer workflow
 
 1. Review source, license/catalog additions and ignored personal files.

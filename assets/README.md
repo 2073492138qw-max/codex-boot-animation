@@ -13,12 +13,5 @@
 不修改 EXE 外观、设置窗口图标、Codex 本体或插件列表展示图标，也不依赖
 下载目录或外部 ICO。读取异常时回退默认系统图标，不阻塞助手启动。
 
-## 公开素材授权（2026-10-06）
-
-维护者确认原图由其使用 AI 生成，并同意四个图标文件及其衍生版本公开上传、
-以 [Creative Commons Attribution 4.0 International（CC BY 4.0）](https://creativecommons.org/licenses/by/4.0/)
-授权使用、修改和再分发。此确认也覆盖 BootPlayer.exe 内嵌的图标以及已有 Alpha.5 安装包。
-
-署名：**Codex Boot Animation contributors — Codex 片头助手兔耳角色图标**。
-再分发时保留署名、许可链接，并注明修改。图标的 CC BY 4.0 与代码/文档的 MIT
-分开适用；不授权第三方商标。此前仅本机使用的授权限制已由这次明确确认取代。
+本次授权范围是本机更换图标。公开发布前需另确认该图片的来源、再分发权限
+与素材授权；不自动把视频的 CC BY 4.0 或代码的 MIT 授权套到此图片上。

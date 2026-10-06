@@ -2,41 +2,12 @@
 
 ## Unreleased
 
-- 2026-10-06：继续诊断上传失败并读取远程完整树：126文件，缺32、不同6、远程独有0。
-  官方网页附件通道仍失败；Git元数据/API可读不等于大文件传输通过，浅clone仍超时。
-  已安装gh未登录，等待其具体账户授权；不读取浏览器凭据、不修改插件、不发布空Release。
-
-- 2026-10-06：用户确认AI图标和插件目录全部现有视频公开授权，补齐CC BY4声明，
-  源码清单包含15个场景视频路径（同片在两场景保留）；本地提交b4a628f。
-  已通过网页提交源码、脚本、文档、图标及部分插件/场景文件。随后文件附件存储
-  请求失败，hooks批次及独立JSON重试无回执，Release的114字节校验文件也失败。
-  完整上传/Release未完成；不把准备队列算提交，不改播放器、不重打Alpha.5 ZIP。
-
-- 2026-10-06：按用户授权用内置浏览器创建GitHub公开仓库，实际提交14个根目录
-  文件（cd0967b快照），README/MIT已显示。其他目录和Alpha.5 Release尚未上传。
-  图标原授权仅本机使用，含图标的素材/EXE/ZIP等待明确公开授权；不假称完整发布。
-  记录网页提交不保留本地历史、子目录不能扁平上传；没有改运行代码、重打包或重启。
-
-- 2026-10-06：补充中文 Alpha.5 发布文案，突出安装者必须自行审核本插件的三项钩子，
-  把来源核对、已启用/已信任区别和 check.cmd 成功标准写明。补齐没有 CLI 命令、
-  没有审核入口或找不全三项时的停止反馈，以及审核后的退出操作。
-  仅文档；不安装、替用户信任、更新运行代码、重打 ZIP 或上传。
-
-- 2026-10-06：将 START-HERE 改为简短中文逐步安装指南，补全 ZIP 解压、安装
-  成功/停止提示、三个钩子的来源审核、无审核提示时的 CLI 备用入口及诊断分流。
-  明确桌面聊天框不能代替 CLI /hooks、普通安装不需要诊断项目、首帧图可选。
-  只修改文档；不改变代码、EXE、安装脚本、当前设置或信任，不重打已核查的 Alpha.5 ZIP。
-  指南单独随发布说明提供，尚未取得新手/另一台电脑的完整照做验收。
-
-## 0.7.0-alpha.5 — locally verified Windows Alpha (2026-10-06)
+## 0.7.0-alpha.5 — local release candidate (2026-10-06)
 
 - Package the accepted completion-delivery baseline without rebuilding the
   executable or changing playback. Synchronize native/portable manifest versions
-  and release guidance; retain earlier ZIPs. Extracted PS5.1/PS7 each pass all
-  40 groups and installer preflight; isolated install/cache/media/three untrusted
-  hooks pass. All protected live files, helper/Codex process identities and old
-  artifacts are unchanged. ZIP is pinned to ead63ed with checksum and a separate
-  verification report; no upload or cross-PC stability claim.
+  and release guidance; retain earlier ZIPs. Local package verification status is
+  recorded separately; no upload or cross-PC stability claim.
 
 - Completion-delivery reliability patch: reserve anonymous requests
   separately, claim/consume only after durable playback-start or merge receipt;

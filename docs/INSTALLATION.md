@@ -4,9 +4,6 @@ The repository contains a prebuilt Windows companion, eleven licensed MP4s, a
 repository-scoped Codex marketplace, and a current-user installation script.
 No administrator rights or Visual Studio are needed for the prebuilt package.
 
-中文用户先看[第一次安装：照着做即可](../START-HERE.md)。下面是详细说明；
-没有审核提示时按本页的中文备用步骤处理，不需要创建任何诊断项目。
-
 ## Requirements
 
 - Windows 10/11 with .NET Framework 4.8 or later and Windows PowerShell 5.1.
@@ -75,27 +72,6 @@ discovering plugin hooks. This package ships only the native `.codex-plugin`
 manifest inside the plugin; the portable reference lives under `docs/`.
 The installer checks that all three hooks are discovered before it registers
 Windows startup. They remain untrusted until reviewed by the user.
-
-<a id="hook-review-fallback"></a>
-
-## 没有钩子审核提示时
-
-先运行 `check.cmd`。只有本插件的钩子显示“尚未信任”或“定义已变更”时，才需要下面的审核。
-若会话启动、消息提交、任务结束这三项均通过，显示“已启用：是 / 信任：已信任”，跳过此节；若没找到钩子或“无法确认”，把相关几行反馈给维护者。
-
-桌面版未提供可见审核入口时，可尝试官方命令行入口：
-
-1. 点 Windows“开始”，搜索 **Windows PowerShell**，普通方式打开，不用管理员。
-2. 输入 `codex`，按回车。若提示“无法识别”，停止并反馈；安装器能找到桌面自带的程序，不代表这个命令已经在系统搜索路径中。不要为此随便下载另一份 CLI。
-3. 若正常打开 Codex 命令行界面，在它的输入处输入 `/hooks`，按回车。**不是在桌面聊天框，也不是直接在 PowerShell 提示符输入 /hooks。** 如果命令不可用、三项找不全或没有审核入口，停止并反馈具体提示与相关检查行，不继续猜命令或重装。
-4. 找到来源属于 `codex-boot-animation` 的 `SessionStart`、`UserPromptSubmit`、`Stop`。查看定义，确认调用的是本插件的 `hooks/BootPlayer.exe`，分别审核、信任并保持启用。**“启用”和“信任”是两件事，三项都要完成，不能只启用插件。** 界面文字可能因版本不同而变化；不认识来源就停止，不选择全部来源一起允许。
-5. 审核完成后关闭这个 PowerShell 窗口，重新双击 `check.cmd`：这三项应通过，显示“已启用：是 / 信任：已信任”。仍不通过就反馈这几行，不手改信任记录。
-
-普通插件安装不需要建立项目级计时 Hook 或诊断项目，不复制别人的信任配置，
-不使用绕过信任的参数。信任针对当前定义；改变定义后需要重新审核。
-这是 [OpenAI 官方的审核规则与 CLI 入口](https://learn.chatgpt.com/docs/hooks)，
-安装、启用不等于已信任，见[插件说明](https://developers.openai.com/plugins/build/plugins)。
-本轮仅核对文档和现有检查代码，没有在一台新电脑上验证上述点击流程。
 
 ## Add or switch videos
 
