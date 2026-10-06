@@ -12,10 +12,13 @@ window; this project does not patch Codex or draw inside its UI.
 **0.7.0-alpha.5 — Windows community preview, not a stable cross-platform plugin.**
 [Download Windows Alpha.5](https://github.com/2073492138qw-max/codex-boot-animation/releases/tag/v0.7.0-alpha.5)
 and follow the [beginner installation guide](START-HERE.md).
-The first GitHub `windows-latest` build passed, but its video-decoder probe failed;
-cloud CI has not passed. This does not replace the existing local acceptance evidence
-or establish second-PC compatibility. The newly authorized optional videos also need
-the source test script's mandatory-cover assertion reconciled with optional covers.
+The initial cloud decoder probe failure is resolved: the test's 12-second total budget
+was too short for hosted Windows cold media initialization. Build, both PowerShell
+suites and packaging now [pass in CI](https://github.com/2073492138qw-max/codex-boot-animation/actions/runs/37436342012).
+Missing optional covers warn rather than fail; decoder/pixel checks remain enabled.
+Optional FFmpeg/ffprobe integration checks ran locally and are explicitly skipped
+on the cloud runner without those tools. See the [repair record](docs/CI-MEDIA-PROBE-2026-10-06.md).
+The original published Alpha.5 ZIP is unchanged. CI does not establish second-PC compatibility.
 Earlier visual acceptance used packaged Codex desktop 26.924.6891.0;
 earlier package checks also ran with desktop 26.928.2636.0 and CLI 0.159.2.
 Alpha.5 local checks use desktop 26.930.3930.0 and CLI 0.160.0; see the
