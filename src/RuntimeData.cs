@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 // LocalAppData can be redirected inside packaged Codex. Keep the companion
 // and hooks on one user-profile path, with an explicit, reversible migration.
 internal static class RuntimeData {
- internal static string Root {get{return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),".codex-boot-animation");}}
+ internal static string Root {get{return RuntimePaths.Root;}}
  static readonly Regex Turn=new Regex(@"^(?:[a-f0-9]{64}\.(?:candidate|claimed)|session-[a-f0-9]{64}\.candidate)$");
  static readonly Regex Desktop=new Regex(@"^[A-Fa-f0-9]{64}\.claim$");
  static IEnumerable<string> States(string root){

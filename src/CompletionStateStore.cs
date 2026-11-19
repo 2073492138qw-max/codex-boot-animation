@@ -28,8 +28,15 @@ internal static class CompletionStateStore {
    string key=Key(session,turn);
    File.WriteAllText(TurnPath(key),kind);
    File.WriteAllText(ScopePath(session),kind+"|"+key);
-   foreach(string pattern in new[]{"*.candidate","*.claimed"})foreach(string file in Directory.GetFiles(Folder,pattern))try{if(File.GetLastWriteTimeUtc(file)<DateTime.UtcNow.AddDays(-1))File.Delete(file);}catch{}
+   foreach(string pattern in new[]{"*.candidate","*.claimed","*.prompt"})foreach(string file in Directory.GetFiles(Folder,pattern))try{if(File.GetLastWriteTimeUtc(file)<DateTime.UtcNow.AddDays(-1))File.Delete(file);}catch{}
   }
+ }
+ internal static bool TryClaimPrompt(string session,string turn){
+  if(String.IsNullOrWhiteSpace(session)||String.IsNullOrWhiteSpace(turn))return true;
+  Directory.CreateDirectory(Folder);
+  string key=Key(session,turn);
+  try{using(new FileStream(Path.Combine(Folder,key+".prompt"),FileMode.CreateNew,FileAccess.Write,FileShare.None)){}return true;}
+  catch(IOException){return false;}
  }
  internal static Resolution Resolve(string session,string key){
   string direct=TurnPath(key);

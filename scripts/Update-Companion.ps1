@@ -16,9 +16,12 @@ if ((Get-FileHash -LiteralPath (Join-Path $target 'hooks\hooks.json')).Hash -ne 
 }
 if ($targetExe -ieq $sourceExe) { throw 'Run this updater from the new release, not from the running installation.' }
 $run = (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -Name CodexBootAnimation -ErrorAction SilentlyContinue).CodexBootAnimation
-if ($KeepStartupDisabled) {
-    if ($run) { throw 'Safety update requires the sign-in entry to have been explicitly disabled first. Nothing changed.' }
-} elseif ($run -ne ('"' + $targetExe + '" --supervise')) { throw 'Target does not match the active Windows sign-in entry. Nothing changed.' }
+$startup = Get-CompanionStartupStatus
+# The Run command also locates the installation for manual-launch hooks. Its
+# presence alone does not say whether Windows will run it at sign-in.
+if ($run -and $run -ne ('"' + $targetExe + '" --supervise')) { throw 'Target does not match the active Windows sign-in entry. Nothing changed.' }
+if (-not $run -and -not $KeepStartupDisabled) { throw 'No active installation is registered. Use -KeepStartupDisabled for an explicitly unregistered installation.' }
+Assert-CompanionStartupPolicy -Status $startup -RegisteredCommand $run -RequireDisabled:$KeepStartupDisabled
 & (Join-Path $PSScriptRoot 'Test.ps1')
 $processes = @(Get-CimInstance Win32_Process -Filter "name='BootPlayer.exe'")
 $other = @($processes | Where-Object { $_.ExecutablePath -ine $targetExe -and $_.CommandLine -match '--(supervise|watch|resident)' })
@@ -27,8 +30,8 @@ $backup = Join-Path ([Environment]::GetFolderPath([Environment+SpecialFolder]::U
 New-Item -ItemType Directory -Path $backup -Force | Out-Null
 Copy-Item -LiteralPath $targetExe -Destination (Join-Path $backup 'BootPlayer.exe')
 function Start-Helper {
-    $adopt = Start-Process -FilePath $targetExe -ArgumentList '--adopt-running' -WindowStyle Hidden -Wait -PassThru
-    if ($adopt.ExitCode -ne 0) { throw 'Could not adopt the current Codex instance.' }
+    $adopt = Invoke-BoundedCompanion -Exe $targetExe -Arguments @('--adopt-running') -TimeoutMs 10000
+    if ($adopt.TimedOut -or $adopt.ExitCode -ne 0) { throw 'Could not adopt the current Codex instance within 10 seconds.' }
     Start-Process -FilePath $targetExe -ArgumentList '--supervise' -WindowStyle Hidden
 }
 function Stop-Helper {
@@ -63,4 +66,4 @@ try {
 Write-Output "Updated companion: $targetExe"
 Write-Output "Rollback binary: $backup"
 Write-Output 'Videos, autostart path, hook definitions/trust, and Codex itself were not changed.'
-if ($KeepStartupDisabled) { Write-Output 'Sign-in startup remains disabled pending real cold-start acceptance; failed updates leave the old helper stopped.' }
+if ($KeepStartupDisabled) { Write-Output 'Sign-in startup remains disabled; failed updates leave the old helper stopped. Re-enabling startup requires an explicit user request.' }

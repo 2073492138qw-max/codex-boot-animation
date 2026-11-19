@@ -8,6 +8,14 @@
 全程中文，面向小白；解释现在做什么、为什么、结果如何，不堆术语。
 不自由发挥、不顺手加功能、不以整理代码为理由改稳定核心。
 
+## 用户长期启动偏好（2026-10-27 更新）
+
+必须区分 Codex 包内注册表视图与 Windows 登录实际视图。2026-10-24 晚用户再次报告自启，独立 Windows 进程证实：包内读回 State=1/助手禁用，但外部仍 State=2/助手无禁用批准。此前“已关闭”的包内读回不能作为系统证据，普通子进程 powershell.exe 也可能继承隔离。启动项修改和验收必须在独立 Windows 进程完成；本轮包外 before/after 回执在 runtime backups/startup-physical-20261024。禁止只清除环境标记后操作真实注册表；只有完全拦截 Windows 操作的隔离单元测试可临时清标记。
+
+Codex 本体只能由用户主动启动。用户在 2026-10-27 明确纠正：动画助手允许随 Windows 登录启动，以便手动打开 Codex 时触发片头；此前同时禁用本体和助手的偏好已被此条取代。
+Codex 包的 StartupTask 保持 DisabledByUser；助手 Run 命令仅启动 BootPlayer.exe --supervise，StartupApproved/Run 的 CodexBootAnimation 允许启用，旧 CodexBootAnimationSupervisor 计划任务仍保持 Disabled，避免重复入口。严禁为恢复动画而启用或启动 Codex 本体。
+执行前参考 `%USERPROFILE%\.codex-boot-animation\startup-policy.json`（CodexStartup=DisabledByUser、AnimationSignInStartup=Enabled）；独立 Windows 回执见 runtime backups/companion-autostart-20261027。不要重跑旧的“助手也禁用”修复脚本或将它当作当前维护要求；后续核对本体/助手两种偏好，不把它们混为一项。
+
 ## 开始与执行
 
 1. 按 AGENTS 的阅读顺序进入项目，先检查 Git 状态。已有改动说明归属，不能混入本次提交。

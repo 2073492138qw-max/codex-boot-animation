@@ -1,6 +1,6 @@
 {
   "name": "codex-boot-animation",
-  "version": "0.7.0-alpha.5",
+  "version": "0.8.0-beta.1",
   "description": "Local videos for Codex desktop startup, new chats, reactions, idle returns, and confirmed task completion on Windows.",
   "author": {
     "name": "Codex Boot Animation contributors"

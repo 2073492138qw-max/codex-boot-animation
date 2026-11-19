@@ -29,6 +29,9 @@ foreach ($expected in @('常驻播放器','正在运行：1 个进程','任务�
     Assert-DiagnosticText ($text.Contains($expected)) ('Missing explanation: '+$expected)
 }
 Assert-DiagnosticText (-not $text.Contains('全部通过')) 'Summary overstated acceptance.'
+$manualRow = [pscustomobject]@{Item='Windows Startup Apps'; Status='PASS'; Detail='Windows sign-in startup is disabled; manual-launch hooks retain the installation path'; NextStep=''}
+$manualText = (Format-BootDiagnostics -Checks @($manualRow)) -join "`n"
+Assert-DiagnosticText ($manualText.Contains('登录自启动已禁用') -and $manualText.Contains('手动启动后的钩子') -and -not $manualText.Contains('下一步：')) 'Disabled startup diagnosis suggests enabling it or loses manual hook support.'
 $knownRows = @($rows | Where-Object { $_.Status -ne 'FUTURE' })
 $knownText = (Format-BootDiagnostics -Checks $knownRows) -join "`n"
 Assert-DiagnosticText ($knownText.Contains('通过 1 项；需检查 2 项；故障 1 项；无法确认 1 项；待实测 1 项')) 'Summary counts changed.'

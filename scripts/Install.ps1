@@ -4,6 +4,7 @@ param([switch]$CheckOnly)
 
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'Install-Support.ps1')
+. (Join-Path $PSScriptRoot 'Media-Preflight.ps1')
 if ([Environment]::OSVersion.Platform -ne [PlatformID]::Win32NT) {
     throw 'This companion supports Windows only.'
 }
@@ -22,13 +23,8 @@ if (Test-Path -LiteralPath (Join-Path $plugin 'plugin.json')) { throw 'This Wind
 if ($manifest.hooks -ne './hooks/hooks.json') { throw 'The plugin manifest does not point to its hooks.' }
 $hooks = Get-Content -LiteralPath (Join-Path $plugin 'hooks\hooks.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 if (-not $hooks.hooks.SessionStart -or -not $hooks.hooks.UserPromptSubmit -or -not $hooks.hooks.Stop) { throw 'Required hook definitions are missing.' }
-$mediaCatalog = Get-Content -LiteralPath (Join-Path $videos 'media-catalog.json') -Raw -Encoding UTF8 | ConvertFrom-Json
-foreach ($relative in $mediaCatalog.files) {
-    if ($relative -match '(^[\\/]|\.\.|:)' -or $relative -notmatch '\.mp4$') { throw 'Unsafe media catalog path.' }
-    $media = Join-Path $videos $relative
-    $cover = [IO.Path]::ChangeExtension($media,$null).TrimEnd('.') + '-first.png'
-    if (-not (Test-Path -LiteralPath $media) -or -not (Test-Path -LiteralPath $cover)) { throw "Release media is missing: $relative" }
-}
+$media = Assert-MediaPreflight -VideosRoot $videos
+Write-Output "Media: $($media.Videos.Count) video(s), $($media.MissingCovers.Count) without an optional cover"
 $frameworkRelease = (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full' -Name Release -ErrorAction SilentlyContinue).Release
 if ($null -eq $frameworkRelease -or $frameworkRelease -lt 528040) { throw '.NET Framework 4.8 or later is required. Install it with Windows Update, then retry install.cmd.' }
 $catalog = Get-Content -LiteralPath $marketplace -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -72,6 +68,8 @@ if ($CheckOnly) {
 if ($env:CODEX_WINDOWS_SANDBOX_PACKAGE_FAMILY) {
     throw 'Run this installer from Windows PowerShell opened via the Start menu, not from the Codex terminal. The Codex registry view may be isolated.'
 }
+$startup = Get-CompanionStartupStatus
+Assert-CompanionStartupPolicy -Status $startup -RegisteredCommand ('"' + $exe + '" --supervise')
 & (Join-Path $PSScriptRoot 'Test.ps1')
 
 if ($registered.Count -eq 0) {

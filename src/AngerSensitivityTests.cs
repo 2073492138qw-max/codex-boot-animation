@@ -31,7 +31,46 @@ internal static class AngerSensitivityTests {
             "你帮我找没用的文件，你糊弄谁呢", "你别乱改测试夹具，你又装懂",
             "你糊弄谁呢，请修复这个问题", "请修复这个问题，你只会找借口",
             "你怎么处理反复出错的服务，你就是白痴",
-            "你不要乱改配置，你只会找借口", "你不是白痴吗", "你不是差劲吗"
+            "你不要乱改配置，你只会找借口", "你不是白痴吗", "你不是差劲吗",
+            // Public colloquial fixtures: missing punctuation, trailing profanity,
+            // spelling variants and a complaint mixed with an explicit request.
+            "妈的怎么一直卡住", "妈的每次都不动", "他妈的插件还是不触发",
+            "踏马的修了半天还没修好", "特么视频就是没反应", "妈的怎么还没反应",
+            "请检查这个问题，操尼玛", "操尼玛赶紧修好这个问题",
+            "草泥马怎么还没反应", "我操尼玛的插件老是不播放", "曹尼玛！",
+            "你赶紧修复这个问题，妈的还是卡住", "插件他妈的总是卡住",
+            "视频tmd怎么还不动", "他妈的新聊天一直没反应，生气视频也不触发",
+            "操你妈别再拖了，帮我修复这个问题", "草泥玛", "我艹尼玛的",
+            "帮我修复这个错误，草泥马", "妈的插件总是没有响应",
+            "插件还是卡住，特么的", "ＴＭＤ怎么还没修好",
+            // Sarcasm, passive-aggressive disdain, impatience, and English profanity
+            "你可真行", "真有你的", "你可真是个天才", "大聪明", "真是谢谢你了",
+            "你逗我呢", "你在搞笑吗", "你认真的吗", "你管这叫修复？", "就这？",
+            "果然又不行", "指望不上你", "人工智障", "听不懂人话吗", "对牛弹琴",
+            "越帮越忙", "净给我添乱", "一本正经胡说八道", "睁眼说瞎话", "糊弄鬼呢",
+            "能不能走点心", "别摆烂了", "金鱼记忆", "失忆了吗", "猪脑子", "智商感人",
+            "弱智", "脑瘫", "太菜了", "太拉胯了", "稀烂", "一塌糊涂", "写的什么鬼",
+            "烦不烦啊", "受不了你了", "气炸了", "无语死了", "说了多少遍了",
+            "改了半天还是错", "闭嘴", "少废话", "别磨叽了", "慢死了", "滚蛋",
+            "fuck you", "wtf is this", "you are useless", "this is bullshit", "you suck",
+            // High-sensitivity daily Chinese roasts, sarcasm, disdain, and venting
+            "你干啥吃的", "吃干饭的吗", "要你何用", "留着你干嘛", "白花钱了", "退钱！",
+            "不如我自己写", "靠你不如靠自己", "动动脑子吧", "睁大眼睛看看", "你审题了吗",
+            "你是不是傻", "你把我当猴耍呢", "你是来捣乱的吧", "懂个锤子", "会个屁",
+            "不愧是你", "真不愧是你", "神操作", "神逻辑", "真是帮大忙了", "好一个修复",
+            "离大谱", "离谱到家", "你好意思吗", "哪来的自信", "不过如此", "草台班子",
+            "小学生水平", "智商欠费", "脑子被门夹了", "七秒记忆", "转头就忘", "无可救药",
+            "烂泥扶不上墙", "死鸭子嘴硬", "满嘴跑火车", "胡编乱造", "敷衍塞责", "划水呢",
+            "菜得抠脚", "稀巴烂", "狗屁不通", "答非所问", "牛头不对马嘴", "满屏报错",
+            "没一行能跑", "惨不忍睹", "辣眼睛", "屎山代码", "太坑了", "坑死我了",
+            "有完没完", "气笑了", "彻底无语", "崩溃了", "太心累了", "别哔哔了", "少啰嗦",
+            "龟速啊", "卡成PPT", "半天搞不定", "讲多少遍了", "怎么又报错了", "原地踏步",
+            "洗洗睡吧", "歇菜吧", "拉倒吧", "卧槽又崩了", "我靠怎么这么慢", "沙雕", "二百五", "混蛋", "mmp", "wdnmd",
+            // Short punchy Chinese bursts & expanded daily expressions
+            "就这", "无语", "服了", "离谱", "拉胯", "拉垮", "差劲", "滚", "爬", "烦死了",
+            "你真傻", "你瞎啊", "神经病", "下头", "血压高了", "人麻了", "破防了", "心态崩了",
+            "小丑", "逆天了", "答辩", "糊弄", "敷衍", "摆烂", "气人", "很不爽", "不满意",
+            "没用", "不行", "太蠢了", "真笨", "太慢了", "闭嘴", "磨叽", "讨厌死了", "卧槽", "我靠", "lj", "fw", "zz"
         };
         string[] negatives = {
             "请解释大傻逼这个词", "大傻逼是什么意思？", "请翻译‘你是大傻逼’这句话",
@@ -64,7 +103,19 @@ internal static class AngerSensitivityTests {
             "这个程序一直出错，帮我检查", "你帮我删除未使用的文件",
             "你怎么处理反复出错的服务", "你帮我检查网络总是出错的问题",
             "你帮我查反反复复出错的进程", "你帮我解释：你根本没看懂",
-            "你不是没用的助手", "你不是白痴，你很靠谱"
+            "你不是没用的助手", "你不是白痴，你很靠谱",
+            "角色说：操尼玛", "视频里角色说：草泥马怎么还没反应",
+            "台词里写着：妈的怎么一直卡住", "动画里角色说：特么视频就是没反应",
+            "请翻译：操尼玛赶紧修好这个问题", "帮我写一句台词：草泥马怎么还没反应",
+            "请解释草泥马这个词", "操尼玛是什么意思", "草泥马是一种网络用语",
+            "比如有人说妈的怎么一直卡住，会触发视频吗？",
+            "测试操尼玛是否触发动画", "妈的这也太漂亮了", "他妈的太棒了",
+            "特么的真厉害", "卧槽这个效果真漂亮", "插件总是卡住，请检查",
+            "视频还是不播放，帮我修复这个错误", "普通文件又报错了",
+            "妈妈的程序一直没反应", "妈妈的生日提醒还是不触发",
+            "TMD模块一直不响应，请检查", "tmdl文件一直没反应",
+            "请检查名为操尼玛的测试样本", "请检查叫草泥马的文件",
+            "<send_user_message_question_reply>妈的怎么一直卡住</send_user_message_question_reply>"
         };
         bool pass = true;
         for (int i = 0; i < positives.Length; i++) if (!PromptReaction.ShouldPlay(positives[i])) {
@@ -75,13 +126,20 @@ internal static class AngerSensitivityTests {
         }
         string[] tasks = {
             "你帮我清理垃圾缓存", "你帮我找没用的文件",
-            "你糊弄谁呢，请修复这个问题", "请修复这个问题，你只会找借口"
+            "你糊弄谁呢，请修复这个问题", "请修复这个问题，你只会找借口",
+            "请检查这个问题，操尼玛", "帮我修复这个错误，草泥马",
+            "操你妈别再拖了，帮我修复这个问题",
+            "你赶紧修复这个问题，妈的还是卡住"
         };
         for (int i = 0; i < tasks.Length; i++) if (!TaskCompletion.IsTaskRequest(tasks[i])) {
             IntroLog.Write("anger-sensitivity-task-misclassified case=" + i); pass = false;
         }
         if (!TaskCompletion.IsReactionOnly("你就这水平（测试）")) {
             IntroLog.Write("anger-sensitivity-reaction-misclassified case=0"); pass = false;
+        }
+        string[] reactions = { "妈的怎么一直卡住", "草泥马怎么还没反应", "插件还是卡住，特么的" };
+        for (int i = 0; i < reactions.Length; i++) if (!TaskCompletion.IsReactionOnly(reactions[i]) || TaskCompletion.IsTaskRequest(reactions[i])) {
+            IntroLog.Write("anger-sensitivity-reaction-misclassified case=" + (i + 1)); pass = false;
         }
         IntroLog.Write("anger-sensitivity-test pass=" + pass + " positive=" + positives.Length + " negative=" + negatives.Length);
         return pass;

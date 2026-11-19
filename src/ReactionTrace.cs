@@ -62,7 +62,7 @@ internal sealed class ReactionTrace {
     static readonly Regex ErrorPattern=new Regex(@"^(?:hook-error-|target-error-)?(?:IOException|TimeoutException|UnauthorizedAccessException|InvalidOperationException|ArgumentException|FormatException|ObjectDisposedException|Win32Exception|JsonException)$");
     static readonly int LoggerPid=Process.GetCurrentProcess().Id;
     static readonly object LogGate=new object();
-    internal static readonly string LogPath=Path.Combine(IntroLog.Data,"reaction-trace.log");
+    internal static string LogPath { get { return Path.Combine(IntroLog.Data,"reaction-trace.log"); } }
     readonly object gate=new object(),writeGate=new object();
     readonly List<string> pending=new List<string>();
     readonly Stopwatch elapsed=Stopwatch.StartNew();
@@ -88,14 +88,9 @@ internal sealed class ReactionTrace {
         } } catch { }
     }
     static void WriteBatch(string batch) {
-        Directory.CreateDirectory(IntroLog.Data);
-        // Separate from legacy playback writes. Exclusive append plus bounded
-        // retry handles a hook batch arriving while the resident writes its batch.
-        lock(LogGate) for(int attempt=0;attempt<3;attempt++) {
-            try { File.AppendAllText(LogPath,batch);return; }
-            catch(IOException) { if(attempt==2)return;Thread.Sleep(5); }
-        }
+        RotatingLog.Append(LogPath, batch);
     }
+
     internal void Flush() {
         try { lock(writeGate) {
             string batch;

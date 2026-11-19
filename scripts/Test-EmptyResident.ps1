@@ -1,10 +1,16 @@
 ﻿#Requires -Version 5.1
 [CmdletBinding()]
-param()
+param([string]$TestRoot)
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path -Parent $PSScriptRoot
 $source = Join-Path $repo 'plugins\codex-boot-animation'
 $fixture = Join-Path ([IO.Path]::GetTempPath()) ('codex-empty-resident-' + [guid]::NewGuid().ToString('N'))
+$ownRoot = $false
+if (-not $TestRoot) {
+    $TestRoot = Join-Path ([IO.Path]::GetTempPath()) ('codex-boot-media-' + [guid]::NewGuid().ToString('N'))
+    New-Item -ItemType Directory -Path $TestRoot | Out-Null
+    $ownRoot = $true
+}
 $hooks = Join-Path $fixture 'hooks'
 $idle = Join-Path $fixture 'videos\闲置互动'
 $process = $null
@@ -14,7 +20,7 @@ try {
     $clip = Get-ChildItem -LiteralPath (Join-Path $source 'videos') -Filter '*.mp4' -Recurse -File | Select-Object -First 1
     if (-not $clip) { throw 'A packaged sample video is required for the isolated idle fixture.' }
     Copy-Item -LiteralPath $clip.FullName -Destination (Join-Path $idle 'fixture.mp4')
-    $process = Start-Process -FilePath (Join-Path $hooks 'BootPlayer.exe') -ArgumentList '--resident-empty-test' -WindowStyle Hidden -PassThru
+    $process = Start-Process -FilePath (Join-Path $hooks 'BootPlayer.exe') -ArgumentList ('--test-root "' + $TestRoot + '" --resident-empty-test') -WindowStyle Hidden -PassThru
     if (-not $process.WaitForExit(10000)) { throw 'Empty-resident test exceeded 10 seconds.' }
     if ($process.ExitCode -ne 0) { throw "Empty-resident test failed: $($process.ExitCode)" }
     Write-Output 'PASS isolated-empty-intros-resident-and-idle-library'
@@ -29,5 +35,8 @@ try {
     }
     foreach ($directory in @($hooks,$idle,(Join-Path $fixture 'videos'),$fixture)) {
         if (Test-Path -LiteralPath $directory) { Remove-Item -LiteralPath $directory }
+    }
+    if ($ownRoot -and (Test-Path -LiteralPath $TestRoot) -and (Split-Path -Leaf $TestRoot) -like 'codex-boot-media-*') {
+        Remove-Item -LiteralPath $TestRoot -Recurse -Force
     }
 }

@@ -33,7 +33,7 @@ internal static class NewChatDiscovery {
  internal static bool CanDiscover(bool ready,bool foreground,bool minimized){return ready&&foreground&&!minimized;}
  internal sealed class Result {
   internal IntPtr Window;internal int Pid;internal Rect Bounds;
-  internal List<Rect> Buttons=new List<Rect>();internal bool TimedOut,Failed,Stale;internal ButtonScanGate Gate;
+  internal List<Rect> Buttons=new List<Rect>();internal bool TimedOut,Failed,Stale;
  }
  [StructLayout(LayoutKind.Sequential)] struct NativeRect {internal int Left,Top,Right,Bottom;}
  [DllImport("user32.dll")] static extern uint GetWindowThreadProcessId(IntPtr window,out uint pid);

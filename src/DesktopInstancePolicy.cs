@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Diagnostics;
 using System.Threading;
@@ -7,7 +7,15 @@ using System.Text;
 
 // Process start ticks distinguish PID reuse. Claims survive watcher recovery and logon races.
 internal static class DesktopInstancePolicy {
- internal static bool IsCodex(Process process){return String.Equals(process.ProcessName,"ChatGPT",StringComparison.OrdinalIgnoreCase)&&process.MainModule.FileName.IndexOf("OpenAI.Codex_",StringComparison.OrdinalIgnoreCase)>=0;}
+ static readonly System.Collections.Concurrent.ConcurrentDictionary<string,bool> known = new System.Collections.Concurrent.ConcurrentDictionary<string,bool>();
+ internal static bool IsCodex(Process process) {
+  if (!String.Equals(process.ProcessName,"ChatGPT",StringComparison.OrdinalIgnoreCase)) return false;
+  string identity=Identity(process); bool result;
+  if (known.TryGetValue(identity,out result)) return result;
+  result=process.MainModule.FileName.IndexOf("OpenAI.Codex_",StringComparison.OrdinalIgnoreCase)>=0;
+  if (known.Count>256) known.Clear();
+  known[identity]=result; return result;
+ }
  internal static string Identity(Process process){return process.Id+":"+process.StartTime.ToUniversalTime().Ticks;}
  internal static bool Claim(string identity,string folder){
   Directory.CreateDirectory(folder);

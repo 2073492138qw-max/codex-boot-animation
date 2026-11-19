@@ -17,7 +17,7 @@ internal static class ResidentProtocol {
   var security=new PipeSecurity();
   security.SetAccessRuleProtection(true,false);
   security.AddAccessRule(new PipeAccessRule(WindowsIdentity.GetCurrent().User,PipeAccessRights.FullControl,AccessControlType.Allow));
-  return new NamedPipeServerStream(name,PipeDirection.InOut,1,PipeTransmissionMode.Byte,PipeOptions.Asynchronous,512,512,security);
+  return new NamedPipeServerStream(name,PipeDirection.InOut,4,PipeTransmissionMode.Byte,PipeOptions.Asynchronous,512,512,security);
  }
  internal static string ReadCommand(NamedPipeServerStream pipe,int deadlineMs){
   var timer=Stopwatch.StartNew();var message=new MemoryStream();byte[] buffer=new byte[64];

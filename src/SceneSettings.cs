@@ -100,7 +100,8 @@ internal sealed class SceneSettingsStore {
 }
 
 internal static class SceneSettings {
- internal static readonly SceneSettingsStore Store=new SceneSettingsStore(Path.Combine(RuntimeData.Root,"scene-settings.json"));
+ static SceneSettingsStore store;
+ internal static SceneSettingsStore Store {get{return store ?? (store=new SceneSettingsStore(Path.Combine(RuntimePaths.Root,"scene-settings.json")));}}
  static SceneSettingsSnapshot current=SceneSettingsSnapshot.Defaults();
  static readonly object refreshLock=new object();
  static FileSystemWatcher watcher;

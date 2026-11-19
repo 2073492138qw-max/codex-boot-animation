@@ -66,7 +66,8 @@ internal sealed class CompletionLayoutStore {
 }
 
 internal static class CompletionLayoutSettings {
- internal static readonly CompletionLayoutStore Store=new CompletionLayoutStore(Path.Combine(RuntimeData.Root,"completion-layout.json"));
+ static CompletionLayoutStore store;
+ internal static CompletionLayoutStore Store {get{return store ?? (store=new CompletionLayoutStore(Path.Combine(RuntimePaths.Root,"completion-layout.json")));}}
  internal static CompletionLayoutPreference Current=CompletionLayoutPreference.Default;
  // Only one-shot completion players read this, before window creation. No new-chat I/O.
  internal static void Initialize(){try{string revision;Current=Store.Read(out revision);}catch(Exception e){Current=CompletionLayoutPreference.Default;IntroLog.Write("completion-layout-read-failed type="+e.GetType().Name+" default-used=True");}}

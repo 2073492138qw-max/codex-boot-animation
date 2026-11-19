@@ -4,15 +4,21 @@ using System.Text;
 
 // Byte offsets belong to complete lines, not to the last write notification.
 internal static class NavigationLogReader {
+ internal const int InitialScanBudget=65537;
  internal static long InitialOffset(Stream stream){
-  // Walk backward in fixed-size blocks; do not load the historical log into RAM.
-  long end=stream.Length;byte[] block=new byte[4096];
-  while(end>0){
-   long start=Math.Max(0,end-block.Length);stream.Position=start;int count=0,wanted=(int)(end-start);
-   while(count<wanted){int read=stream.Read(block,count,wanted-count);if(read==0)break;count+=read;}
+  bool discardPartial;return InitialOffset(stream,out discardPartial);
+ }
+ internal static long InitialOffset(Stream stream,out bool discardPartial){
+  // Preserve a pending valid-size line, but never scan unbounded history.
+  discardPartial=false;
+  long length=stream.Length,end=length,floor=Math.Max(0,length-InitialScanBudget);byte[] block=new byte[4096];
+  while(end>floor){
+   long start=Math.Max(floor,end-block.Length);stream.Position=start;int count=0,wanted=(int)(end-start);
+   while(count<wanted){int read=stream.Read(block,count,wanted-count);if(read==0)throw new EndOfStreamException();count+=read;}
    for(int index=count-1;index>=0;index--)if(block[index]=='\n')return start+index+1;
    end=start;
   }
+  if(length>NavigationCursor.LineLimit){discardPartial=true;return length;}
   return 0;
  }
  internal static string Read(Stream stream,ref long offset){

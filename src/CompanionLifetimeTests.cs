@@ -15,14 +15,16 @@ internal static class CompanionLifetimeTests {
  [DllImport("kernel32.dll",SetLastError=true)] static extern bool AssignProcessToJobObject(IntPtr job,IntPtr process);
  static string Exe {get{return Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"BootPlayer.exe");}}
  internal static int Probe(string file){
-  using(var process=Process.GetCurrentProcess())File.WriteAllText(file,process.Id+"|"+CompanionLifetime.InJob()+"|"+Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)+"|"+Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)+"|log-bytes="+(File.Exists(Path.Combine(IntroLog.Data,"playback.log"))?new FileInfo(Path.Combine(IntroLog.Data,"playback.log")).Length:0));
+  using(var process=Process.GetCurrentProcess())File.WriteAllText(file,process.Id+"|"+CompanionLifetime.InJob()+"|"+Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)+"|"+Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)+"|log-bytes="+(File.Exists(Path.Combine(IntroLog.Data,"playback.log"))?new FileInfo(Path.Combine(IntroLog.Data,"playback.log")).Length:0)+"|"+RuntimePaths.Root);
   Thread.Sleep(30000);return 0;
  }
  internal static int Parent(string folder){
   try{
   // The normal child's window is also hidden; it is still host-bound.
-  Process.Start(new ProcessStartInfo{FileName=Exe,Arguments="--lifetime-probe "+CompanionLifetime.Quote(Path.Combine(folder,"bound")),UseShellExecute=false,CreateNoWindow=true});
-  CompanionLifetime.LaunchDetached(Exe,"--lifetime-probe "+CompanionLifetime.Quote(Path.Combine(folder,"detached")));
+  string isolated="--test-root "+CompanionLifetime.Quote(RuntimePaths.Root)+" ";
+  Process.Start(new ProcessStartInfo{FileName=Exe,Arguments=isolated+"--lifetime-probe "+CompanionLifetime.Quote(Path.Combine(folder,"bound")),UseShellExecute=false,CreateNoWindow=true});
+  // The WMI broker does not inherit our environment. Pass the binding explicitly.
+  CompanionLifetime.LaunchDetached(Exe,isolated+"--lifetime-probe "+CompanionLifetime.Quote(Path.Combine(folder,"detached")));
   File.WriteAllText(Path.Combine(folder,"ready"),"ready");Thread.Sleep(30000);return 0;
   }catch(Exception e){IntroLog.Write("lifetime-parent-error type="+e.GetType().Name+" error="+e.Message);return 2;}
  }
@@ -39,6 +41,7 @@ internal static class CompanionLifetimeTests {
    if(CompanionLifetime.ResumeThread(parent.Thread)==UInt32.MaxValue)throw new InvalidOperationException("Resume test parent failed.");
    if(!Wait(delegate{return File.Exists(Path.Combine(folder,"ready"))&&File.Exists(Path.Combine(folder,"bound"))&&File.Exists(Path.Combine(folder,"detached"));},10000))throw new InvalidOperationException("Lifetime fixtures did not start.");
    string[] a=File.ReadAllText(Path.Combine(folder,"bound")).Split('|'),b=File.ReadAllText(Path.Combine(folder,"detached")).Split('|');
+   if(a.Length!=6||b.Length!=6||!String.Equals(a[5],RuntimePaths.Root,StringComparison.OrdinalIgnoreCase)||!String.Equals(b[5],RuntimePaths.Root,StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Lifetime child lost its isolated runtime root.");
    bound=Process.GetProcessById(Int32.Parse(a[0]));detached=Process.GetProcessById(Int32.Parse(b[0]));
    IntroLog.Write("lifetime-test-ownership bound="+a[1]+" detached="+b[1]+" detached-pid="+b[0]+" actual-job="+CompanionLifetime.InJob(detached.Handle));
    if(a[1]!="True"||b[1]!="False"||CompanionLifetime.InJob(detached.Handle))throw new InvalidOperationException("Incorrect host-job ownership.");

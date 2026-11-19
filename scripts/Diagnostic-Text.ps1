@@ -10,7 +10,7 @@ function Format-BootDiagnostics {
         'Plugin'='插件安装与启用'; 'Multiple installs'='重复安装'; 'Codex CLI / plugin'='命令行与插件状态';
         'Hook: sessionStart'='会话启动钩子'; 'Hook: userPromptSubmit'='消息提交钩子'; 'Hook: stop'='任务结束钩子';
         'Hook trust'='钩子信任'; 'Sign-in startup'='登录自启动登记'; 'Active videos folder'='当前视频目录';
-        'Windows Startup Apps'='Windows 自启动实测'; 'Hook cache root'='钩子缓存目录';
+        'Windows Startup Apps'='Windows 自启动状态'; 'Hook cache root'='钩子缓存目录';
         'Cached vs active EXE'='缓存与运行程序一致性'; 'Helper --supervise'='助手守护进程';
         'Helper --watch'='触发监控进程'; 'Helper --resident'='常驻播放器'; 'Helper IPC'='助手通信';
         'Other helper copies'='其他目录的助手'; 'Helper processes'='助手进程状态';
@@ -32,6 +32,10 @@ function Format-BootDiagnostics {
         'An unexpected startup command is registered'='自启动登记了非预期命令';
         'No current-user startup entry is registered'='当前用户没有登记助手自启动';
         'The Run entry is registered; Windows enablement/sign-in execution still needs acceptance'='已登记自启动；Windows 是否允许及登录后能否启动，仍需实际验收';
+        'Windows sign-in startup is disabled; manual-launch hooks retain the installation path'='Windows 登录自启动已禁用；安装路径保留给手动启动后的钩子使用';
+        'Saved manual-start preference conflicts with unverified Windows disablement'='已保存仅手动启动偏好，但尚未确认 Windows 已禁用自启动';
+        'Sign-in startup is not verified disabled; a Run entry alone does not prove execution'='未确认登录自启动已禁用；仅有登记项不能证明登录时会执行';
+        'Windows startup approval or saved preference could not be read'='无法读取 Windows 自启动状态或已保存的启动偏好';
         'Cached hook fallback and active helper have different binaries'='缓存中的备用程序与正在使用的助手版本不一致';
         'Resident pipe responded without requesting playback'='常驻播放器通信正常；本检查没有请求播放';
         'Helper readiness/communication failed'='助手未就绪或通信失败';
@@ -58,7 +62,8 @@ function Format-BootDiagnostics {
         'Restore the original folder or deliberately migrate the installation.'='恢复原安装目录，或按迁移说明处理；不要直接删视频。';
         'Review the old installation before changing it.'='先核对旧安装和自启动命令，不要直接覆盖。';
         'Run install.cmd from Explorer, not from the Codex terminal.'='从资源管理器双击 install.cmd，不要在 Codex 内的终端安装。';
-        'Keep this installation folder in place. Also check Windows Startup Apps is enabled.'='保留当前安装目录，并确认 Windows 自启动设置允许此助手运行。';
+        'Keep the installation path; sign-in permission is checked separately.'='保留当前安装目录；是否允许登录自启动另行核对。';
+        'Keep startup disabled; check Windows Startup Apps and the saved preference.'='保持自启动关闭，核对 Windows 启动应用设置及已保存的偏好。';
         'Use this folder or the helper tray menu to change the active videos.'='把视频放在此目录对应的场景文件夹，也可从助手托盘菜单打开目录。';
         'Check Windows Settings > Apps > Startup. A real reboot is a separate manual test.'='查看 Windows 设置 → 应用 → 启动。真实重启需单独手测；这不是判定已验收失败。';
         'Hook caches and the active media folder are separate. Edit active videos through the tray menu.'='钩子缓存不是实际视频目录；请从助手托盘打开视频目录，不要改缓存。';

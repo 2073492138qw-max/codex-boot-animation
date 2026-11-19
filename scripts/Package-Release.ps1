@@ -1,14 +1,16 @@
-﻿#Requires -Version 5.1
+#Requires -Version 5.1
 [CmdletBinding()]
 param()
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'Media-Preflight.ps1')
 $repo = Split-Path -Parent $PSScriptRoot
 Push-Location $repo
 try {
     $dirty = @(& git status --porcelain --untracked-files=normal)
     if ($LASTEXITCODE -ne 0 -or $dirty.Count -ne 0) { throw 'Commit reviewed files before packaging; a release is an immutable Git snapshot.' }
-    & (Join-Path $PSScriptRoot 'Test.ps1')
+    $null = Assert-MediaPreflight -VideosRoot (Join-Path $repo 'plugins\codex-boot-animation\videos')
+    & (Join-Path $PSScriptRoot 'Test.ps1') -IncludeMedia
     $version = (Get-Content 'plugins\codex-boot-animation\.codex-plugin\plugin.json' -Raw -Encoding UTF8 | ConvertFrom-Json).version
     $dist = Join-Path $repo 'dist'
     New-Item -ItemType Directory -Path $dist -Force | Out-Null

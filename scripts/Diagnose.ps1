@@ -57,7 +57,7 @@ $run = (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -
 $activeExe = $null
 if ($run -match '^"([^"]+BootPlayer\.exe)"\s+--supervise\s*$') {
     $activeExe = $Matches[1]
-    if (Test-Path -LiteralPath $activeExe) { Add-BootCheck 'Sign-in startup' 'PASS' $activeExe 'Keep this installation folder in place. Also check Windows Startup Apps is enabled.' }
+    if (Test-Path -LiteralPath $activeExe) { Add-BootCheck 'Sign-in startup' 'INFO' $activeExe 'Keep the installation path; sign-in permission is checked separately.' }
     else { Add-BootCheck 'Sign-in startup' 'FAIL' 'Startup points to a missing executable' 'Restore the original folder or deliberately migrate the installation.' }
 } elseif ($run) { Add-BootCheck 'Sign-in startup' 'WARN' 'An unexpected startup command is registered' 'Review the old installation before changing it.' }
 else { Add-BootCheck 'Sign-in startup' 'FAIL' 'No current-user startup entry is registered' 'Run install.cmd from Explorer, not from the Codex terminal.' }
@@ -65,7 +65,18 @@ $activeRoot = $null
 if ($activeExe -and (Test-Path -LiteralPath $activeExe)) {
     $activeRoot = Split-Path -Parent (Split-Path -Parent $activeExe)
     Add-BootCheck 'Active videos folder' 'INFO' (Join-Path $activeRoot 'videos') 'Use this folder or the helper tray menu to change the active videos.'
-    Add-BootCheck 'Windows Startup Apps' 'PENDING' 'The Run entry is registered; Windows enablement/sign-in execution still needs acceptance' 'Check Windows Settings > Apps > Startup. A real reboot is a separate manual test.'
+    try {
+        $startup = Get-CompanionStartupStatus
+        if ($startup.ApprovalState -eq 'Disabled') {
+            Add-BootCheck 'Windows Startup Apps' 'PASS' 'Windows sign-in startup is disabled; manual-launch hooks retain the installation path' ''
+        } elseif ($startup.ManualOnly) {
+            Add-BootCheck 'Windows Startup Apps' 'FAIL' 'Saved manual-start preference conflicts with unverified Windows disablement' 'Keep startup disabled; check Windows Startup Apps and the saved preference.'
+        } else {
+            Add-BootCheck 'Windows Startup Apps' 'PENDING' 'Sign-in startup is not verified disabled; a Run entry alone does not prove execution' 'Check Windows Settings > Apps > Startup. A real reboot is a separate manual test.'
+        }
+    } catch {
+        Add-BootCheck 'Windows Startup Apps' 'UNKNOWN' 'Windows startup approval or saved preference could not be read' 'Keep startup disabled; check Windows Startup Apps and the saved preference.'
+    }
     if ($hooks) {
         $cacheRoots = @($hooks | ForEach-Object { Split-Path -Parent (Split-Path -Parent $_.sourcePath) } | Select-Object -Unique)
         foreach ($cacheRoot in $cacheRoots) {
@@ -82,7 +93,8 @@ if ($activeExe -and (Test-Path -LiteralPath $activeExe)) {
             $count = @($processes | Where-Object { $_.CommandLine -match ('(?:^|\s)' + $mode + '(?:\s|$)') }).Count
             Add-BootCheck ('Helper ' + $mode) $(if ($count -eq 1) { 'PASS' } else { 'FAIL' }) ('Running processes: ' + $count) 'Retry installation from the active folder; check security software notices and the local log if startup fails.'
         }
-        if (Wait-CodexCompanion -Exe $activeExe -TimeoutSeconds 0) { Add-BootCheck 'Helper IPC' 'PASS' 'Resident pipe responded without requesting playback' '' }
+        # Bounded readiness: one second, not a zero budget (0 means an expired deadline).
+        if (Wait-CodexCompanion -Exe $activeExe -TimeoutSeconds 1) { Add-BootCheck 'Helper IPC' 'PASS' 'Resident pipe responded without requesting playback' '' }
         else { Add-BootCheck 'Helper IPC' 'FAIL' 'Helper readiness/communication failed' 'Check the local log; close an obsolete helper through its tray before retrying.' }
         $other = @(Get-CimInstance Win32_Process -Filter "name='BootPlayer.exe'" | Where-Object {
             $_.ExecutablePath -and $_.ExecutablePath -ine $activeExe -and $_.CommandLine -match '(?:^|\s)--(?:supervise|watch|resident)(?:\s|$)'

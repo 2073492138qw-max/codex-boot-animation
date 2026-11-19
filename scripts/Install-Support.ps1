@@ -1,5 +1,58 @@
 #Requires -Version 5.1
 # Shared installation checks. Loading this file does not change any settings.
+function Get-CompanionStartupStatus {
+    param([string]$RuntimeRoot)
+    if ($env:CODEX_WINDOWS_SANDBOX_PACKAGE_FAMILY) {
+        throw 'An isolated Codex registry view cannot verify Windows sign-in startup. Run this check from independent Windows PowerShell.'
+    }
+    if (-not $RuntimeRoot) { $RuntimeRoot = Join-Path ([Environment]::GetFolderPath('UserProfile')) '.codex-boot-animation' }
+    $policyPath = Join-Path $RuntimeRoot 'startup-policy.json'
+    $manualOnly = $false
+    if (Test-Path -LiteralPath $policyPath) {
+        # A damaged preference must not silently turn into permission to autostart.
+        $policy = Get-Content -LiteralPath $policyPath -Raw -Encoding UTF8 -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+        if ($null -eq $policy -or $policy.AnimationSignInStartup -isnot [string] -or $policy.AnimationSignInStartup -cnotin @('Disabled','Enabled')) {
+            throw 'Invalid startup-policy.json; startup preference could not be verified. Nothing changed.'
+        }
+        $manualOnly = $policy.AnimationSignInStartup -ceq 'Disabled'
+    }
+    $approvalKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run'
+    $approval = $null
+    if (Test-Path -LiteralPath $approvalKey -ErrorAction Stop) {
+        $approval = (Get-ItemProperty -Path $approvalKey -ErrorAction Stop).CodexBootAnimation
+    }
+    $state = 'NotConfigured'
+    if ($null -ne $approval) {
+        $state = 'Unknown'
+        if ($approval -is [byte[]] -and $approval.Length -eq 12) {
+            $code = [BitConverter]::ToUInt32($approval, 0)
+            # Only known enabled/disabled records are conclusive. Unknown records
+            # must not satisfy an explicit keep-disabled requirement.
+            if ($code -eq 3) { $state = 'Disabled' }
+            elseif ($code -eq 2) { $state = 'Enabled' }
+        }
+    }
+    return [pscustomobject]@{ ManualOnly = $manualOnly; ApprovalState = $state }
+}
+
+function Assert-CompanionStartupPolicy {
+    param($Status, [string]$RegisteredCommand, [switch]$RequireDisabled)
+    if (($Status.ManualOnly -or $RequireDisabled) -and $RegisteredCommand -and $Status.ApprovalState -ne 'Disabled') {
+        throw 'Sign-in startup is not verified disabled. Disable CodexBootAnimation in Windows Startup Apps before retrying; the saved manual-start preference was preserved.'
+    }
+}
+
+function Resolve-IsolatedRuntimeRoot {
+    param([string]$RuntimeRoot)
+    # Compile the exact validator included in BootPlayer, only for test mode.
+    # Normal startup installation has no dependency on the source tree.
+    if (-not ('BootAnimationTestRoot' -as [type])) {
+        Add-Type -Path (Join-Path (Split-Path -Parent $PSScriptRoot) 'src\IsolatedRuntimeRoot.cs')
+    }
+    $realRoot = Join-Path ([Environment]::GetFolderPath('UserProfile')) '.codex-boot-animation'
+    return [BootAnimationTestRoot]::Validate($RuntimeRoot, $realRoot)
+}
+
 function Invoke-CodexInstallerCommand {
     param([string]$CliPath, [string[]]$Arguments, [int]$TimeoutSeconds = 15)
     if ([IO.Path]::GetExtension($CliPath) -ne '.exe') {
@@ -128,9 +181,40 @@ function Get-CodexBootHooks {
     }
 }
 
+# One absolute deadline covers adopt, lifetime, pipe probe and readiness. Each
+# step only receives the remaining budget; a late success is still a timeout.
+function New-InstallBudget {
+    param([int]$TimeoutSeconds = 60)
+    return [pscustomobject]@{ Timer = [Diagnostics.Stopwatch]::StartNew(); Seconds = $TimeoutSeconds }
+}
+function Get-InstallRemainingMs {
+    param($Budget)
+    $remaining = [int]($Budget.Seconds * 1000 - $Budget.Timer.ElapsedMilliseconds)
+    if ($remaining -lt 0) { return 0 }
+    return $remaining
+}
+function Get-InstallRemainingSeconds {
+    param($Budget)
+    return [int][Math]::Ceiling((Get-InstallRemainingMs -Budget $Budget) / 1000.0)
+}
+# Bounded wait for a helper this script started. On timeout only that child is
+# terminated; no process is ever killed by name.
+function Invoke-BoundedCompanion {
+    param([string]$Exe, [string[]]$Arguments, [int]$TimeoutMs)
+    if ($TimeoutMs -le 0) { return [pscustomobject]@{ ExitCode = $null; TimedOut = $true } }
+    $child = Start-Process -FilePath $Exe -ArgumentList $Arguments -WindowStyle Hidden -PassThru
+    try {
+        if (-not $child.WaitForExit($TimeoutMs)) {
+            try { $child.Kill() } catch { }
+            try { $null = $child.WaitForExit(1000) } catch { }
+            return [pscustomobject]@{ ExitCode = $null; TimedOut = $true }
+        }
+        return [pscustomobject]@{ ExitCode = $child.ExitCode; TimedOut = $false }
+    } finally { $child.Dispose() }
+}
 function Wait-CodexCompanion {
     param([string]$Exe, [int]$TimeoutSeconds = 20)
-    $timer = [Diagnostics.Stopwatch]::StartNew()
+    $budget = New-InstallBudget -TimeoutSeconds $TimeoutSeconds
     do {
         $processes = @(Get-CodexCompanionProcesses -Exe $Exe)
         $ready = $true
@@ -143,16 +227,17 @@ function Wait-CodexCompanion {
         if ($ready) {
             # Being alive now is insufficient: an attached helper dies with Codex.
             $supervisor = $processes | Where-Object { $_.CommandLine -match '(?:^|\s)--supervise(?:\s|$)' } | Select-Object -First 1
-            $lifetime = Start-Process -FilePath $Exe -ArgumentList @('--lifetime-check', $supervisor.ProcessId) -WindowStyle Hidden -Wait -PassThru
-            if ($lifetime.ExitCode -ne 0) { $ready = $false }
+            $lifetime = Invoke-BoundedCompanion -Exe $Exe -Arguments @('--lifetime-check', $supervisor.ProcessId) -TimeoutMs (Get-InstallRemainingMs -Budget $budget)
+            if ($lifetime.TimedOut -or $lifetime.ExitCode -ne 0) { $ready = $false }
         }
         if ($ready) {
             # An invalid idle token only checks IPC; it never requests playback.
-            $probe = Start-Process -FilePath $Exe -ArgumentList '--idle-pipe-probe' -WindowStyle Hidden -Wait -PassThru
-            if ($probe.ExitCode -eq 0) { return $true }
+            $probe = Invoke-BoundedCompanion -Exe $Exe -Arguments @('--idle-pipe-probe') -TimeoutMs (Get-InstallRemainingMs -Budget $budget)
+            if (-not $probe.TimedOut -and $probe.ExitCode -eq 0) { return $true }
         }
-        if ($timer.Elapsed.TotalSeconds -ge $TimeoutSeconds) { break }
-        Start-Sleep -Milliseconds 300
-    } while ($timer.Elapsed.TotalSeconds -lt $TimeoutSeconds)
+        $remaining = Get-InstallRemainingMs -Budget $budget
+        if ($remaining -le 0) { break }
+        Start-Sleep -Milliseconds ([Math]::Min(300, $remaining))
+    } while ($true)
     return $false
 }
